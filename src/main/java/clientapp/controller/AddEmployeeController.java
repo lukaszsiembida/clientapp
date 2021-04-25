@@ -3,6 +3,7 @@ package clientapp.controller;
 import clientapp.dto.EmployeeDto;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
@@ -34,6 +35,8 @@ public class AddEmployeeController implements Initializable {
     @FXML
     private TextField salaryTextField;
 
+    private Stage stage;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -62,11 +65,11 @@ public class AddEmployeeController implements Initializable {
 
     private void initializeCancelButton() {
         cancelButton.setOnAction((x) -> {
+            stage.close();
         });
-        getStage().close();
     }
 
-    private Stage getStage() {
-        return (Stage) addEmployeeBorderPane.getScene().getWindow();
+    public void setStage(Stage addEmployeeStage) {
+        this.stage = addEmployeeStage;
     }
 }

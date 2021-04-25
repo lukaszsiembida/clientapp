@@ -14,6 +14,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -39,6 +40,8 @@ public class MainViewController implements Initializable {
     @FXML
     private TableView<DepartmentTableModel> departmentTableView;
 
+    private Stage stage;
+
     public MainViewController() {
     }
 
@@ -58,21 +61,24 @@ public class MainViewController implements Initializable {
         initializeAddEmployeeButton();
     }
 
-     private void initializeAddEmployeeButton() {
-         addButton.setOnAction((x) -> {
-             Stage addEmployeeStage = new Stage();
-             addEmployeeStage.initStyle(StageStyle.UNDECORATED);
-             addEmployeeStage.initModality(Modality.APPLICATION_MODAL);
-             try {
-                Parent addEmployeeParent = FXMLLoader.load(getClass().getResource(ADD_EMPLOYEE_FXML));
+    private void initializeAddEmployeeButton() {
+        addButton.setOnAction((x) -> {
+            Stage addEmployeeStage = new Stage();
+            addEmployeeStage.initOwner(stage.getOwner());
+            addEmployeeStage.initModality(Modality.APPLICATION_MODAL);
+            try {
+                FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(ADD_EMPLOYEE_FXML));
+                Parent addEmployeeParent = fxmlLoader.load();
+                ((AddEmployeeController) fxmlLoader.getController()).setStage(addEmployeeStage);
                 Scene scene = new Scene(addEmployeeParent, 500, 400);
                 addEmployeeStage.setScene(scene);
-                addEmployeeStage.show();
-             } catch (IOException e) {
-                 e.printStackTrace();
-             }
-         });
-     }
+                addEmployeeStage.showAndWait();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
     private void initializeDepartmentTableView() {
         departmentTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
@@ -130,6 +136,11 @@ public class MainViewController implements Initializable {
     private void loadDepartmentData(ObservableList<DepartmentTableModel> departmentData) {
         departmentData.add(new DepartmentTableModel(1L, "IT"));
         departmentData.add(new DepartmentTableModel(2L, "HR"));
+    }
+
+    public void setStage(Stage primaryStage) {
+        this.stage = primaryStage;
+
     }
 }
 

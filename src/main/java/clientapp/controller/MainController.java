@@ -1,5 +1,8 @@
 package clientapp.controller;
 
+import clientapp.dto.DepartmentDto;
+import clientapp.rest.DepartmentRestClient;
+import clientapp.rest.EmployeeRestClient;
 import clientapp.table.DepartmentTableModel;
 import clientapp.table.EmployeeTableModel;
 import javafx.collections.FXCollections;
@@ -14,19 +17,26 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import javafx.stage.StageStyle;
+import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
-public class MainViewController implements Initializable {
+public class MainController implements Initializable {
 
 
     private static final String ADD_EMPLOYEE_FXML = "/fxml/addEmployee.fxml";
+    private final DepartmentRestClient departmentRestClient;
+    private Stage stage;
+
+    public MainController() {
+        departmentRestClient = new DepartmentRestClient();
+    }
 
     @FXML
     private Button addButton;
@@ -40,10 +50,6 @@ public class MainViewController implements Initializable {
     @FXML
     private TableView<DepartmentTableModel> departmentTableView;
 
-    private Stage stage;
-
-    public MainViewController() {
-    }
 
     @FXML
     public void onActionButtonAdd() {
@@ -134,8 +140,12 @@ public class MainViewController implements Initializable {
     }
 
     private void loadDepartmentData(ObservableList<DepartmentTableModel> departmentData) {
-        departmentData.add(new DepartmentTableModel(1L, "IT"));
-        departmentData.add(new DepartmentTableModel(2L, "HR"));
+        Thread thread = new Thread(() -> {
+            List<DepartmentDto> departmentDtos = departmentRestClient.getDepartments();
+            List<DepartmentTableModel> departmentTableModels = departmentDtos.stream().map(DepartmentTableModel::of).collect(Collectors.toList());
+            departmentData.addAll(departmentTableModels);
+        });
+        thread.start();
     }
 
     public void setStage(Stage primaryStage) {

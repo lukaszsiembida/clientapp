@@ -1,5 +1,7 @@
 package clientapp.table;
 
+import clientapp.dto.DepartmentDto;
+import clientapp.dto.EmployeeDto;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
 
@@ -21,4 +23,7 @@ public class DepartmentTableModel {
         return departmentName.get();
     }
 
+    public static DepartmentTableModel of(DepartmentDto dto) {
+        return new DepartmentTableModel(dto.getDepartmentId(), dto.getDepartmentName());
+    }
 }

@@ -3,19 +3,18 @@ package clientapp.controller;
 import clientapp.dto.EmployeeDto;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
-import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
 public class AddEmployeeController implements Initializable {
 
-    @FXML
-    private BorderPane addEmployeeBorderPane;
+    Logger logger = LoggerFactory.getLogger(AddEmployeeController.class);
 
     @FXML
     private Button saveButton;
@@ -46,11 +45,14 @@ public class AddEmployeeController implements Initializable {
 
     private void initializeSaveButton() {
         saveButton.setOnAction((x) -> {
-            performTextFieldData();
+            EmployeeDto dto = createEmployeeDto();
+            logger.debug("Zapis danych pracownika");
+            stage.close();
+
         });
     }
 
-    private void performTextFieldData() {
+    private EmployeeDto createEmployeeDto() {
         String firstName = firstNameTextField.getText();
         String lastName = lastNameTextField.getText();
         String pesel = peselTextField.getText();
@@ -60,11 +62,13 @@ public class AddEmployeeController implements Initializable {
         dto.setLastName(lastName);
         dto.setPesel(pesel);
         dto.setSalary(salary);
+        return dto;
     }
 
 
     private void initializeCancelButton() {
         cancelButton.setOnAction((x) -> {
+            logger.debug("Anulowanie zapisu danych pracownika");
             stage.close();
         });
     }

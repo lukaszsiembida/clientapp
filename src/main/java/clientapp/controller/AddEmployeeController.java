@@ -1,6 +1,7 @@
 package clientapp.controller;
 
 import clientapp.dto.EmployeeDto;
+import clientapp.rest.EmployeeRestClient;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -15,6 +16,11 @@ import java.util.ResourceBundle;
 public class AddEmployeeController implements Initializable {
 
     Logger logger = LoggerFactory.getLogger(AddEmployeeController.class);
+    private  final EmployeeRestClient employeeRestClient;
+
+    public AddEmployeeController() {
+        this.employeeRestClient = new EmployeeRestClient();
+    }
 
     @FXML
     private Button saveButton;
@@ -46,11 +52,11 @@ public class AddEmployeeController implements Initializable {
     private void initializeSaveButton() {
         saveButton.setOnAction((x) -> {
             EmployeeDto dto = createEmployeeDto();
-            logger.debug("Zapis danych pracownika");
-            stage.close();
-
-        });
-    }
+            employeeRestClient.saveEmployee(dto, () -> {
+                logger.debug("Zapis danych pracownika");
+                stage.close();
+            });
+    });}
 
     private EmployeeDto createEmployeeDto() {
         String firstName = firstNameTextField.getText();
@@ -64,7 +70,6 @@ public class AddEmployeeController implements Initializable {
         dto.setSalary(salary);
         return dto;
     }
-
 
     private void initializeCancelButton() {
         cancelButton.setOnAction((x) -> {

@@ -1,8 +1,10 @@
 package clientapp.controller;
 
+import clientapp.dto.EmployeeDto;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
@@ -20,7 +22,7 @@ public class AddEmployeeController implements Initializable {
     @FXML
     private Button cancelButton;
 
-   /* @FXML
+    @FXML
     private TextField firstNameTextField;
 
     @FXML
@@ -30,19 +32,41 @@ public class AddEmployeeController implements Initializable {
     private TextField peselTextField;
 
     @FXML
-    private TextField salaryTextField;*/
+    private TextField salaryTextField;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+
         initializeCancelButton();
+        initializeSaveButton();
     }
 
+    private void initializeSaveButton() {
+        saveButton.setOnAction((x) -> {
+            performTextFieldData();
+        });
+    }
+
+    private void performTextFieldData() {
+      String firstName = firstNameTextField.getText();
+      String lastName = lastNameTextField.getText();
+      String pesel = peselTextField.getText();
+      Integer salary = Integer.valueOf(salaryTextField.getText());
+      EmployeeDto dto = new EmployeeDto();
+      dto.setFirstName(firstName);
+      dto.setLastName(lastName);
+      dto.setPesel(pesel);
+      dto.setSalary(salary);
+    }
+
+
     private void initializeCancelButton() {
-       cancelButton.setOnAction((x) -> {});
+        cancelButton.setOnAction((x) -> {
+        });
         getStage().close();
     }
 
-    private Stage getStage(){
+    private Stage getStage() {
         return (Stage) addEmployeeBorderPane.getScene().getWindow();
     }
 }

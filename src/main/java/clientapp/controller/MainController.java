@@ -1,6 +1,7 @@
 package clientapp.controller;
 
 import clientapp.dto.DepartmentDto;
+import clientapp.dto.EmployeeDto;
 import clientapp.rest.DepartmentRestClient;
 import clientapp.rest.EmployeeRestClient;
 import clientapp.table.DepartmentTableModel;
@@ -32,10 +33,12 @@ public class MainController implements Initializable {
 
     private static final String ADD_EMPLOYEE_FXML = "/fxml/addEmployee.fxml";
     private final DepartmentRestClient departmentRestClient;
+    private final EmployeeRestClient employeeRestClient;
     private Stage stage;
 
     public MainController() {
         departmentRestClient = new DepartmentRestClient();
+        employeeRestClient = new EmployeeRestClient();
     }
 
     @FXML
@@ -134,9 +137,12 @@ public class MainController implements Initializable {
     }
 
     private void loadEmployeeData(ObservableList<EmployeeTableModel> employeeData) {
-        employeeData.add(new EmployeeTableModel(1L, "Szymon", "Pawełek", "82949487363", 3000));
-        employeeData.add(new EmployeeTableModel(2L, "Julia", "Gulia", "85949487363", 4000));
-        employeeData.add(new EmployeeTableModel(3L, "Szymon", "Guzik", "92349487363", 5000));
+        Thread thread = new Thread(() -> {
+            List<EmployeeDto> employeeDtos = employeeRestClient.getEmployees();
+            List<EmployeeTableModel> employeeTableModels = employeeDtos.stream().map(EmployeeTableModel::of).collect(Collectors.toList());
+            employeeData.addAll(employeeTableModels);
+        });
+        thread.start();
     }
 
     private void loadDepartmentData(ObservableList<DepartmentTableModel> departmentData) {

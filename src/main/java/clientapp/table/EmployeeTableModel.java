@@ -1,5 +1,7 @@
 package clientapp.table;
 
+import clientapp.dto.DepartmentDto;
+import clientapp.dto.EmployeeDto;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -39,5 +41,10 @@ public class EmployeeTableModel {
 
     public Integer getSalary() {
         return salary.get();
+    }
+
+    public static EmployeeTableModel of(EmployeeDto dto) {
+        return new EmployeeTableModel(dto.getEmployeeId(), dto.getFirstName(),
+                dto.getLastName(), dto.getPesel(), dto.getSalary());
     }
 }

@@ -51,15 +51,15 @@ public class AddEmployeeController implements Initializable {
     }
 
     private void performTextFieldData() {
-      String firstName = firstNameTextField.getText();
-      String lastName = lastNameTextField.getText();
-      String pesel = peselTextField.getText();
-      Integer salary = Integer.valueOf(salaryTextField.getText());
-      EmployeeDto dto = new EmployeeDto();
-      dto.setFirstName(firstName);
-      dto.setLastName(lastName);
-      dto.setPesel(pesel);
-      dto.setSalary(salary);
+        String firstName = firstNameTextField.getText();
+        String lastName = lastNameTextField.getText();
+        String pesel = peselTextField.getText();
+        Integer salary = Integer.valueOf(salaryTextField.getText());
+        EmployeeDto dto = new EmployeeDto();
+        dto.setFirstName(firstName);
+        dto.setLastName(lastName);
+        dto.setPesel(pesel);
+        dto.setSalary(salary);
     }
 
 

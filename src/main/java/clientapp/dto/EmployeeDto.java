@@ -9,6 +9,7 @@ public class EmployeeDto {
     private String firstName;
     private String lastName;
     private String pesel;
-    private Integer salary;
+    private Double salary;
+    private String departmentName;
 
 }

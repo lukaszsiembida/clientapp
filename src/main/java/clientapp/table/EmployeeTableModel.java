@@ -1,8 +1,7 @@
 package clientapp.table;
 
-import clientapp.dto.DepartmentDto;
 import clientapp.dto.EmployeeDto;
-import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
 
@@ -12,15 +11,15 @@ public class EmployeeTableModel {
     private final SimpleStringProperty firstName;
     private final SimpleStringProperty lastName;
     private final SimpleStringProperty pesel;
-    private final SimpleIntegerProperty salary;
+    private final SimpleDoubleProperty salary;
 
 
-    public EmployeeTableModel(Long id, String firstName, String lastName, String pesel, Integer salary) {
+    public EmployeeTableModel(Long id, String firstName, String lastName, String pesel, Double salary) {
         this.employeeId = new SimpleLongProperty(id);
         this.firstName = new SimpleStringProperty(firstName);
         this.lastName = new SimpleStringProperty(lastName);
         this.pesel = new SimpleStringProperty(pesel);
-        this.salary = new SimpleIntegerProperty(salary);
+        this.salary = new SimpleDoubleProperty(salary);
     }
 
     public Long getEmployeeId() {
@@ -39,7 +38,7 @@ public class EmployeeTableModel {
         return pesel.get();
     }
 
-    public Integer getSalary() {
+    public double getSalary() {
         return salary.get();
     }
 

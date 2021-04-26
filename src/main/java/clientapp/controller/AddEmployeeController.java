@@ -9,6 +9,7 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -52,17 +53,20 @@ public class AddEmployeeController implements Initializable {
     private void initializeSaveButton() {
         saveButton.setOnAction((x) -> {
             EmployeeDto dto = createEmployeeDto();
-            employeeRestClient.saveEmployee(dto, () -> {
-                logger.debug("Zapis danych pracownika");
-                stage.close();
-            });
+            ResponseEntity responseEntity = employeeRestClient.saveEmployee(dto);
+            if(ResponseEntity.ok().equals(responseEntity)){
+                logger.debug("Zapisano dane pracownika");
+            } else {
+               logger.debug("Zapis danych nie powiódł się");
+            }
+            stage.close();
     });}
 
     private EmployeeDto createEmployeeDto() {
         String firstName = firstNameTextField.getText();
         String lastName = lastNameTextField.getText();
         String pesel = peselTextField.getText();
-        Integer salary = Integer.valueOf(salaryTextField.getText());
+        Double salary = Double.valueOf(salaryTextField.getText());
         EmployeeDto dto = new EmployeeDto();
         dto.setFirstName(firstName);
         dto.setLastName(lastName);

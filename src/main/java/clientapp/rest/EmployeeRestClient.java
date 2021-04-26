@@ -1,11 +1,8 @@
 package clientapp.rest;
 
-import clientapp.controller.AddEmployeeController;
 import clientapp.dto.EmployeeDto;
-import clientapp.handler.SavedEmployeeHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
@@ -29,12 +26,8 @@ public class EmployeeRestClient {
         return Arrays.asList(employeesResponseEntity.getBody());
     }
 
-    public void saveEmployee(EmployeeDto dto, SavedEmployeeHandler handler) {
+    public ResponseEntity saveEmployee(EmployeeDto dto) {
         ResponseEntity<EmployeeDto> responseEntity = restTemplate.postForEntity(POST_EMPLOYEES_URL, dto, EmployeeDto.class);
-        if(HttpStatus.OK.equals(responseEntity.getStatusCode())){
-            handler.handle();
-        } else {
-            logger.warn("Użytkownik nie został zapisany.");
-        }
+        return responseEntity;
     }
 }

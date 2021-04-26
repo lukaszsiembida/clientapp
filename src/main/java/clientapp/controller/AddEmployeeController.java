@@ -1,7 +1,9 @@
 package clientapp.controller;
 
+import clientapp.dto.DepartmentDto;
 import clientapp.dto.EmployeeDto;
 import clientapp.rest.EmployeeRestClient;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
@@ -9,7 +11,6 @@ import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
 
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -18,6 +19,8 @@ public class AddEmployeeController implements Initializable {
 
     Logger logger = LoggerFactory.getLogger(AddEmployeeController.class);
     private  final EmployeeRestClient employeeRestClient;
+
+    private DepartmentDto selected;
 
     public AddEmployeeController() {
         this.employeeRestClient = new EmployeeRestClient();
@@ -41,6 +44,9 @@ public class AddEmployeeController implements Initializable {
     @FXML
     private TextField salaryTextField;
 
+    @FXML
+    private TextField departmentNameTextField;
+
     private Stage stage;
 
     @Override
@@ -53,25 +59,27 @@ public class AddEmployeeController implements Initializable {
     private void initializeSaveButton() {
         saveButton.setOnAction((x) -> {
             EmployeeDto dto = createEmployeeDto();
-            ResponseEntity responseEntity = employeeRestClient.saveEmployee(dto);
-            if(ResponseEntity.ok().equals(responseEntity)){
-                logger.debug("Zapisano dane pracownika");
-            } else {
-               logger.debug("Zapis danych nie powiódł się");
-            }
-            stage.close();
+            Thread thread = new Thread(() -> {
+                employeeRestClient.saveEmployee(dto);
+                Platform.runLater(() ->{
+                    stage.close();
+                });
+            });
+            thread.start();
     });}
 
     private EmployeeDto createEmployeeDto() {
         String firstName = firstNameTextField.getText();
         String lastName = lastNameTextField.getText();
         String pesel = peselTextField.getText();
-        Double salary = Double.valueOf(salaryTextField.getText());
+        Double salary = Double.parseDouble(salaryTextField.getText());
+        String departmentName = departmentNameTextField.getText();
         EmployeeDto dto = new EmployeeDto();
         dto.setFirstName(firstName);
         dto.setLastName(lastName);
         dto.setPesel(pesel);
         dto.setSalary(salary);
+        dto.setDepartmentName(departmentName);
         return dto;
     }
 

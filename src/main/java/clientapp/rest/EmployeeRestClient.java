@@ -1,8 +1,11 @@
 package clientapp.rest;
 
+import clientapp.controller.AddEmployeeController;
 import clientapp.dto.EmployeeDto;
+import clientapp.handler.ProcessFinishedHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
@@ -26,8 +29,12 @@ public class EmployeeRestClient {
         return Arrays.asList(employeesResponseEntity.getBody());
     }
 
-    public ResponseEntity saveEmployee(EmployeeDto dto) {
+    public void saveEmployee(EmployeeDto dto) {
         ResponseEntity<EmployeeDto> responseEntity = restTemplate.postForEntity(POST_EMPLOYEES_URL, dto, EmployeeDto.class);
-        return responseEntity;
+        if(HttpStatus.OK.equals(responseEntity.getStatusCode())){
+            logger.debug("Udany zapis dto");
+        } else {
+        throw new RuntimeException("Nie można zapisać dto: " + dto);
+        }
     }
 }

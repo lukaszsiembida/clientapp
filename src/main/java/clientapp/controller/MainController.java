@@ -94,7 +94,7 @@ public class MainController implements Initializable {
                 FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource(ADD_EMPLOYEE_FXML));
                 Parent addEmployeeParent = fxmlLoader.load();
                 ((AddEmployeeController) fxmlLoader.getController()).setStage(addEmployeeStage);
-                Scene scene = new Scene(addEmployeeParent, 500, 400);
+                Scene scene = new Scene(addEmployeeParent, 500, 450);
                 addEmployeeStage.setScene(scene);
                 addEmployeeStage.showAndWait();
             } catch (IOException e) {

@@ -8,6 +8,7 @@ import clientapp.table.DepartmentTableModel;
 import clientapp.table.EmployeeTableModel;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -20,7 +21,8 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.springframework.web.client.RestTemplate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URL;
@@ -30,16 +32,20 @@ import java.util.stream.Collectors;
 
 public class MainController implements Initializable {
 
-
+    Logger logger = LoggerFactory.getLogger(MainController.class);
     private static final String ADD_EMPLOYEE_FXML = "/fxml/addEmployee.fxml";
+    private Stage stage;
+
     private final DepartmentRestClient departmentRestClient;
     private final EmployeeRestClient employeeRestClient;
-    private Stage stage;
 
     public MainController() {
         departmentRestClient = new DepartmentRestClient();
         employeeRestClient = new EmployeeRestClient();
     }
+
+    private ObservableList<DepartmentTableModel> departmentData = FXCollections.observableArrayList();
+    private ObservableList<EmployeeTableModel> employeeData = FXCollections.observableArrayList();
 
     @FXML
     private Button addButton;
@@ -53,7 +59,6 @@ public class MainController implements Initializable {
     @FXML
     private TableView<DepartmentTableModel> departmentTableView;
 
-
     @FXML
     public void onActionButtonAdd() {
         Alert alertButtonAdd = new Alert(Alert.AlertType.INFORMATION);
@@ -62,12 +67,22 @@ public class MainController implements Initializable {
         alertButtonAdd.showAndWait();
     }
 
+    @FXML
+    void onActionButtonDelete(ActionEvent event) {
+        Alert alertButtonDelete = new Alert(Alert.AlertType.INFORMATION);
+        alertButtonDelete.setTitle("Baza danych");
+        alertButtonDelete.setHeaderText("Element został usunięty z bazy danych");
+        alertButtonDelete.showAndWait();
+    }
+
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
         initializeDepartmentTableView();
         initializeEmployeeTableView();
         initializeAddEmployeeButton();
+        initializeDeleteButton();
     }
 
     private void initializeAddEmployeeButton() {
@@ -88,6 +103,16 @@ public class MainController implements Initializable {
         });
     }
 
+    private void initializeDeleteButton() {
+        deleteButton.setOnAction((x) -> {
+            DepartmentTableModel selectedDepartment = departmentTableView.getSelectionModel().getSelectedItem();
+            if(selectedDepartment != null){
+                departmentRestClient.deleteDepartment(selectedDepartment.getDepartmentId());
+                logger.debug("Usunięcie rekordu działu!");
+            }
+        });
+    }
+
     private void initializeDepartmentTableView() {
         departmentTableView.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
@@ -95,13 +120,12 @@ public class MainController implements Initializable {
         departmentIdColumn.setPrefWidth(5);
         departmentIdColumn.setCellValueFactory(new PropertyValueFactory<DepartmentTableModel, Long>("departmentId"));
 
-        TableColumn departmentNameColumn = new TableColumn("Nazwa departamentu");
+        TableColumn departmentNameColumn = new TableColumn("Nazwa działu");
         departmentNameColumn.setMinWidth(20);
         departmentNameColumn.setCellValueFactory(new PropertyValueFactory<DepartmentTableModel, String>("departmentName"));
 
         departmentTableView.getColumns().addAll(departmentIdColumn, departmentNameColumn);
 
-        ObservableList<DepartmentTableModel> departmentData = FXCollections.observableArrayList();
         loadDepartmentData(departmentData);
         departmentTableView.setItems(departmentData);
     }
@@ -130,17 +154,17 @@ public class MainController implements Initializable {
         salaryColumn.setCellValueFactory(new PropertyValueFactory<EmployeeTableModel, Integer>("salary"));
 
         employeeTableView.getColumns().addAll(employeeIdColumn, firstNameColumn, lastNameColumn, peselColumn, salaryColumn);
-
-        ObservableList<EmployeeTableModel> employeeData = FXCollections.observableArrayList();
-        loadEmployeeData(employeeData);
         employeeTableView.setItems(employeeData);
+        loadEmployeeData(employeeData);
+
     }
 
     private void loadEmployeeData(ObservableList<EmployeeTableModel> employeeData) {
         Thread thread = new Thread(() -> {
             List<EmployeeDto> employeeDtos = employeeRestClient.getEmployees();
             List<EmployeeTableModel> employeeTableModels = employeeDtos.stream().map(EmployeeTableModel::of).collect(Collectors.toList());
-            employeeData.addAll(employeeTableModels);
+            this.employeeData.clear();
+            this.employeeData.addAll(employeeTableModels);
         });
         thread.start();
     }
@@ -149,7 +173,8 @@ public class MainController implements Initializable {
         Thread thread = new Thread(() -> {
             List<DepartmentDto> departmentDtos = departmentRestClient.getDepartments();
             List<DepartmentTableModel> departmentTableModels = departmentDtos.stream().map(DepartmentTableModel::of).collect(Collectors.toList());
-            departmentData.addAll(departmentTableModels);
+            this.departmentData.clear();
+            this.departmentData.addAll(departmentTableModels);
         });
         thread.start();
     }

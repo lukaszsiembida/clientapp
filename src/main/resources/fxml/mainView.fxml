@@ -13,7 +13,7 @@
             <buttons>
                 <TextField prefHeight="29.0" prefWidth="500.0" />
                 <Button fx:id="addButton" mnemonicParsing="false" onAction="#onActionButtonAdd" prefHeight="30.0" prefWidth="60.0" styleClass="mybutton" text="Dodaj" />
-                <Button fx:id="deleteButton" mnemonicParsing="false" prefHeight="30.0" prefWidth="60.0" styleClass="mybutton" text="Usuń" />
+                <Button fx:id="deleteButton" mnemonicParsing="false" onAction="#onActionButtonDelete" prefHeight="30.0" prefWidth="60.0" styleClass="mybutton" text="Usuń" />
             </buttons>
         </ButtonBar>
     </bottom>

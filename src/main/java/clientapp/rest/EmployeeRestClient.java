@@ -12,8 +12,8 @@ import java.util.List;
 public class EmployeeRestClient {
 
     Logger logger = LoggerFactory.getLogger(EmployeeRestClient.class);
-    private static final String GET_EMPLOYEES_URL = "http://localhost:8080/employees";
-    private static final String POST_EMPLOYEES_URL = "http://localhost:8080/employees/add";
+    private static final String EMPLOYEES_URL = "http://localhost:8080/employees";
+    private static final String POST_EMPLOYEES_URL = EMPLOYEES_URL + "/add";
     private final RestTemplate restTemplate;
 
     public EmployeeRestClient() {
@@ -22,7 +22,7 @@ public class EmployeeRestClient {
 
     public List<EmployeeDto> getEmployees(){
         ResponseEntity<EmployeeDto[]> employeesResponseEntity =
-                restTemplate.getForEntity(GET_EMPLOYEES_URL, EmployeeDto[].class);
+                restTemplate.getForEntity(EMPLOYEES_URL, EmployeeDto[].class);
         return Arrays.asList(employeesResponseEntity.getBody());
     }
 

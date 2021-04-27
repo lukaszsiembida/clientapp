@@ -100,6 +100,8 @@ public class MainController implements Initializable {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            loadDepartmentData(departmentData);
+            loadEmployeeData(employeeData);
         });
     }
 

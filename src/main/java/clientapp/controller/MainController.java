@@ -108,10 +108,17 @@ public class MainController implements Initializable {
     private void initializeDeleteButton() {
         deleteButton.setOnAction((x) -> {
             DepartmentTableModel selectedDepartment = departmentTableView.getSelectionModel().getSelectedItem();
+            EmployeeTableModel selectedEmployee = employeeTableView.getSelectionModel().getSelectedItem();
             if(selectedDepartment != null){
                 departmentRestClient.deleteDepartment(selectedDepartment.getDepartmentId());
                 logger.debug("Usunięcie rekordu działu!");
             }
+            if(selectedEmployee != null) {
+                employeeRestClient.deleteEmployee(selectedEmployee.getEmployeeId());
+                logger.debug("Usunięcie rekordu działu!");
+            }
+            loadDepartmentData(departmentData);
+            loadEmployeeData(employeeData);
         });
     }
 

@@ -1,7 +1,6 @@
 package clientapp.table;
 
 import clientapp.dto.DepartmentDto;
-import clientapp.dto.EmployeeDto;
 import javafx.beans.property.SimpleLongProperty;
 import javafx.beans.property.SimpleStringProperty;
 

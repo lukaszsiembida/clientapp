@@ -37,4 +37,8 @@ public class EmployeeRestClient {
         throw new RuntimeException("Nie można zapisać dto: " + dto);
         }
     }
+
+    public void deleteEmployee(long employeeId) {
+        restTemplate.delete(EMPLOYEES_URL+"/"+ employeeId);
+    }
 }

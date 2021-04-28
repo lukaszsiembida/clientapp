@@ -136,6 +136,7 @@ public class MainController implements Initializable {
 
         loadDepartmentData();
         departmentTableView.setItems(departmentData);
+        logger.debug("Załadowanie danych do widoku tabeli działu");
     }
 
     private void initializeEmployeeTableView() {
@@ -164,6 +165,7 @@ public class MainController implements Initializable {
         employeeTableView.getColumns().addAll(employeeIdColumn, firstNameColumn, lastNameColumn, peselColumn, salaryColumn);
         loadEmployeeData();
         employeeTableView.setItems(employeeData);
+        logger.debug("Załadowanie danych do widoku tabeli pracownika");
 
     }
 

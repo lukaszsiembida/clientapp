@@ -44,8 +44,8 @@ public class MainController implements Initializable {
         employeeRestClient = new EmployeeRestClient();
     }
 
-    private ObservableList<DepartmentTableModel> departmentData = FXCollections.observableArrayList();
-    private ObservableList<EmployeeTableModel> employeeData = FXCollections.observableArrayList();
+    private final ObservableList<DepartmentTableModel> departmentData = FXCollections.observableArrayList();
+    private final ObservableList<EmployeeTableModel> employeeData = FXCollections.observableArrayList();;
 
     @FXML
     private Button addButton;
@@ -75,7 +75,6 @@ public class MainController implements Initializable {
         alertButtonDelete.showAndWait();
     }
 
-
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
@@ -100,8 +99,8 @@ public class MainController implements Initializable {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            loadDepartmentData(departmentData);
-            loadEmployeeData(employeeData);
+            loadDepartmentData();
+            loadEmployeeData();
         });
     }
 
@@ -109,16 +108,16 @@ public class MainController implements Initializable {
         deleteButton.setOnAction((x) -> {
             DepartmentTableModel selectedDepartment = departmentTableView.getSelectionModel().getSelectedItem();
             EmployeeTableModel selectedEmployee = employeeTableView.getSelectionModel().getSelectedItem();
-            if(selectedDepartment != null){
+            if (selectedDepartment != null) {
                 departmentRestClient.deleteDepartment(selectedDepartment.getDepartmentId());
                 logger.debug("Usunięcie rekordu działu!");
             }
-            if(selectedEmployee != null) {
+            if (selectedEmployee != null) {
                 employeeRestClient.deleteEmployee(selectedEmployee.getEmployeeId());
                 logger.debug("Usunięcie rekordu działu!");
             }
-            loadDepartmentData(departmentData);
-            loadEmployeeData(employeeData);
+            loadDepartmentData();
+            loadEmployeeData();
         });
     }
 
@@ -135,7 +134,7 @@ public class MainController implements Initializable {
 
         departmentTableView.getColumns().addAll(departmentIdColumn, departmentNameColumn);
 
-        loadDepartmentData(departmentData);
+        loadDepartmentData();
         departmentTableView.setItems(departmentData);
     }
 
@@ -163,22 +162,29 @@ public class MainController implements Initializable {
         salaryColumn.setCellValueFactory(new PropertyValueFactory<EmployeeTableModel, Integer>("salary"));
 
         employeeTableView.getColumns().addAll(employeeIdColumn, firstNameColumn, lastNameColumn, peselColumn, salaryColumn);
+        loadEmployeeData();
         employeeTableView.setItems(employeeData);
-        loadEmployeeData(employeeData);
 
     }
 
-    private void loadEmployeeData(ObservableList<EmployeeTableModel> employeeData) {
+    private void loadEmployeeData() {
         Thread thread = new Thread(() -> {
-            List<EmployeeDto> employeeDtos = employeeRestClient.getEmployees();
-            List<EmployeeTableModel> employeeTableModels = employeeDtos.stream().map(EmployeeTableModel::of).collect(Collectors.toList());
-            this.employeeData.clear();
-            this.employeeData.addAll(employeeTableModels);
+            departmentTableView.setOnMouseClicked(d -> {
+              for(DepartmentTableModel departmentTable : departmentTableView.getSelectionModel().getSelectedItems())  {
+                  List<EmployeeDto> employeeDtos = employeeRestClient.getEmployees();
+                  List<EmployeeTableModel> employeeTableModels = employeeDtos.stream()
+                          .filter(e -> departmentTable.getDepartmentName().equals(e.getDepartmentName()))
+                          .map(EmployeeTableModel::of)
+                          .collect(Collectors.toList());
+                  this.employeeData.clear();
+                  this.employeeData.addAll(employeeTableModels);
+              }
+            });
         });
         thread.start();
     }
 
-    private void loadDepartmentData(ObservableList<DepartmentTableModel> departmentData) {
+    private void loadDepartmentData() {
         Thread thread = new Thread(() -> {
             List<DepartmentDto> departmentDtos = departmentRestClient.getDepartments();
             List<DepartmentTableModel> departmentTableModels = departmentDtos.stream().map(DepartmentTableModel::of).collect(Collectors.toList());

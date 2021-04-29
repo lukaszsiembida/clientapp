@@ -13,7 +13,7 @@
 
 <BorderPane fx:id="addEmployeeBorderPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="450.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="clientapp.controller.AddEmployeeController">
    <top>
-      <Label text="    Okno  pracownika: " BorderPane.alignment="CENTER">
+      <Label text="    Okno  dodawania: " BorderPane.alignment="CENTER">
          <font>
             <Font size="18.0" />
          </font>

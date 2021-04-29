@@ -2,6 +2,7 @@ package clientapp.controller;
 
 import clientapp.dto.DepartmentDto;
 import clientapp.dto.EmployeeDto;
+import clientapp.factory.PopupFactory;
 import clientapp.rest.EmployeeRestClient;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -20,10 +21,12 @@ public class AddEmployeeController implements Initializable {
     Logger logger = LoggerFactory.getLogger(AddEmployeeController.class);
     private  final EmployeeRestClient employeeRestClient;
 
-    private DepartmentDto selected;
+    private final PopupFactory popupFactory;
 
     public AddEmployeeController() {
         this.employeeRestClient = new EmployeeRestClient();
+        this.popupFactory = new PopupFactory();
+
     }
 
     @FXML
@@ -59,13 +62,14 @@ public class AddEmployeeController implements Initializable {
     private void initializeSaveButton() {
         saveButton.setOnAction((x) -> {
             EmployeeDto dto = createEmployeeDto();
-            Thread thread = new Thread(() -> {
-                employeeRestClient.saveEmployee(dto);
-                Platform.runLater(() ->{
-                    stage.close();
+
+                employeeRestClient.saveEmployee(dto, ()->{
+                    Stage pop = popupFactory.createInfoPopup("Uzupełnij wszystkie pola lub pole nazwy działu");
+                    Platform.runLater(() ->{
+                        stage.close();
+                    });
+                    pop.show();
                 });
-            });
-            thread.start();
     });}
 
     private EmployeeDto createEmployeeDto() {

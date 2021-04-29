@@ -29,10 +29,11 @@ public class EmployeeRestClient {
         return Arrays.asList(employeesResponseEntity.getBody());
     }
 
-    public void saveEmployee(EmployeeDto dto) {
+    public void saveEmployee(EmployeeDto dto, ProcessFinishedHandler handler) {
         ResponseEntity<EmployeeDto> responseEntity = restTemplate.postForEntity(POST_EMPLOYEES_URL, dto, EmployeeDto.class);
         if(HttpStatus.OK.equals(responseEntity.getStatusCode())){
             logger.debug("Udany zapis dto");
+            handler.handle();
         } else {
         throw new RuntimeException("Nie można zapisać dto: " + dto);
         }

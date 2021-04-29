@@ -3,6 +3,7 @@ package clientapp.controller;
 import clientapp.dto.DepartmentDto;
 import clientapp.dto.EmployeeDto;
 import clientapp.factory.PopupFactory;
+import clientapp.rest.DepartmentRestClient;
 import clientapp.rest.EmployeeRestClient;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -20,10 +21,12 @@ public class AddEmployeeController implements Initializable {
 
     Logger logger = LoggerFactory.getLogger(AddEmployeeController.class);
     private  final EmployeeRestClient employeeRestClient;
+    private  final DepartmentRestClient departmentRestClient;
 
     private final PopupFactory popupFactory;
 
     public AddEmployeeController() {
+        this.departmentRestClient = new DepartmentRestClient();
         this.employeeRestClient = new EmployeeRestClient();
         this.popupFactory = new PopupFactory();
 
@@ -61,16 +64,43 @@ public class AddEmployeeController implements Initializable {
 
     private void initializeSaveButton() {
         saveButton.setOnAction((x) -> {
-            EmployeeDto dto = createEmployeeDto();
-
-                employeeRestClient.saveEmployee(dto, ()->{
-                    Stage pop = popupFactory.createInfoPopup("Uzupełnij wszystkie pola lub pole nazwy działu");
-                    Platform.runLater(() ->{
-                        stage.close();
+            boolean isEmployeeDataFieldsEmpty = firstNameTextField.getText().isEmpty() ||
+                    lastNameTextField.getText().isEmpty() ||
+                    peselTextField.getText().isEmpty() || departmentNameTextField.getText().isEmpty();
+            boolean isDepartmentNameFieldEmpty = (firstNameTextField.getText().isEmpty() ||
+                    lastNameTextField.getText().isEmpty() ||
+                    peselTextField.getText().isEmpty() ) && !departmentNameTextField.getText().isEmpty();
+            if (!isEmployeeDataFieldsEmpty){
+                EmployeeDto employeeDto = createEmployeeDto();
+                employeeRestClient.saveEmployee(employeeDto, () -> {
+                    Stage infoPopup = popupFactory.createInfoPopup("Pracownik został zapisany", () -> {
+                        Platform.runLater(() -> {
+                            stage.close();
+                        });
                     });
-                    pop.show();
+                    infoPopup.show();
                 });
+            } else if (isDepartmentNameFieldEmpty) {
+                DepartmentDto departmentDto = createDepartmentDto();
+                departmentRestClient.saveDepartment(departmentDto, () -> {
+                    Stage infoPopup = popupFactory.createInfoPopup("Dział został zapisany", () -> {
+                        Platform.runLater(() -> {
+                            stage.close();
+                        });
+                    });
+                    infoPopup.show();
+                });
+            } else {
+                popupFactory.createInfoPopup("Uzupełnij wszystkie pola lub pole nazwy działu").show();
+            }
     });}
+
+    private DepartmentDto createDepartmentDto() {
+        String departmentName = departmentNameTextField.getText();
+        DepartmentDto dto = new DepartmentDto();
+        dto.setDepartmentName(departmentName);
+        return dto;
+    }
 
     private EmployeeDto createEmployeeDto() {
         String firstName = firstNameTextField.getText();

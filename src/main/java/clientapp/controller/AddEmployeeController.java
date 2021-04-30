@@ -20,8 +20,8 @@ import java.util.ResourceBundle;
 public class AddEmployeeController implements Initializable {
 
     Logger logger = LoggerFactory.getLogger(AddEmployeeController.class);
-    private  final EmployeeRestClient employeeRestClient;
-    private  final DepartmentRestClient departmentRestClient;
+    private final EmployeeRestClient employeeRestClient;
+    private final DepartmentRestClient departmentRestClient;
 
     private final PopupFactory popupFactory;
 
@@ -67,31 +67,43 @@ public class AddEmployeeController implements Initializable {
             boolean isEmployeeDataFieldsEmpty = firstNameTextField.getText().isEmpty() ||
                     lastNameTextField.getText().isEmpty() ||
                     peselTextField.getText().isEmpty() || departmentNameTextField.getText().isEmpty();
-            boolean isDepartmentNameFieldEmpty = (firstNameTextField.getText().isEmpty() ||
+            boolean isDepartmentNameFieldNotEmpty = (firstNameTextField.getText().isEmpty() ||
                     lastNameTextField.getText().isEmpty() ||
-                    peselTextField.getText().isEmpty() ) && !departmentNameTextField.getText().isEmpty();
-            if (!isEmployeeDataFieldsEmpty){
+                    peselTextField.getText().isEmpty()) && !departmentNameTextField.getText().isEmpty();
+            boolean isSalaryFieldParseDouble = salaryTextField.getText().matches("^\\\\d+$");
+            boolean isPeselCorrect = peselTextField.getText().matches("[0-9]{11}");
+            if (!isEmployeeDataFieldsEmpty && isSalaryFieldParseDouble && isPeselCorrect) {
                 EmployeeDto employeeDto = createEmployeeDto();
                 employeeRestClient.saveEmployee(employeeDto, () -> {
-                    Stage infoPopup = popupFactory.createInfoPopup("Pracownik został zapisany", () -> {
+                    Stage infoPopup = popupFactory.createInfoPopup("Pracownik został pomyślnie zapisany", () -> {
                         Platform.runLater(() -> {
                             stage.close();
                         });
                     });
                     infoPopup.show();
                 });
-            } else if (isDepartmentNameFieldEmpty) {
-                DepartmentDto departmentDto = createDepartmentDto();
-                departmentRestClient.saveDepartment(departmentDto, () -> {
-                    Stage infoPopup = popupFactory.createInfoPopup("Dział został zapisany", () -> {
-                        Platform.runLater(() -> {
-                            stage.close();
-                        });
+        } else if (isDepartmentNameFieldNotEmpty) {
+            DepartmentDto departmentDto = createDepartmentDto();
+            departmentRestClient.saveDepartment(departmentDto, () -> {
+                Stage infoPopup = popupFactory.createInfoPopup("Dział został pomyślnie zapisany", () -> {
+                    Platform.runLater(() -> {
+                        stage.close();
                     });
-                    infoPopup.show();
                 });
-            } else {
-                popupFactory.createInfoPopup("Uzupełnij wszystkie pola lub pole nazwy działu").show();
+                infoPopup.show();
+            });
+        } else {
+                String infoText ="";
+                if(isEmployeeDataFieldsEmpty){
+                    infoText += "Uzupełnij brakujące pola.\n";
+                }
+                if(!isSalaryFieldParseDouble){
+                    infoText += "Pensja w nieprawidłowym formacie.\n";
+                }
+                if (!isPeselCorrect){
+                    infoText += "Pesel w nieprawidłowym formacie.\n";
+                }
+                popupFactory.createInfoPopup(infoText).show();
             }
     });}
 

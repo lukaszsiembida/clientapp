@@ -48,6 +48,14 @@
    <center>
       <VBox prefHeight="178.0" prefWidth="500.0" BorderPane.alignment="CENTER">
          <children>
+            <Label text="Uwaga! W celu dodania nowego działu bez pracowników wystarczy wypełnić pole &quot;dział&quot; i kliknąć &quot;Zapisz&quot;">
+               <VBox.margin>
+                  <Insets left="10.0" />
+               </VBox.margin>
+               <font>
+                  <Font size="10.0" />
+               </font>
+            </Label>
             <Label prefHeight="30.0" text="Imię">
                <padding>
                   <Insets left="10.0" />

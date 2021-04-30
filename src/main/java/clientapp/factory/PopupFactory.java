@@ -33,7 +33,7 @@ public class PopupFactory {
         });
 
         pane.getChildren().addAll(label, okButton);
-        popupStage.setScene(new Scene(pane, 200, 100));
+        popupStage.setScene(new Scene(pane, 300, 200));
 
         return popupStage;
     }

@@ -70,7 +70,7 @@ public class AddEmployeeController implements Initializable {
             boolean isDepartmentNameFieldNotEmpty = (firstNameTextField.getText().isEmpty() ||
                     lastNameTextField.getText().isEmpty() ||
                     peselTextField.getText().isEmpty()) && !departmentNameTextField.getText().isEmpty();
-            boolean isSalaryFieldParseDouble = salaryTextField.getText().matches("^\\\\d+$");
+            boolean isSalaryFieldParseDouble = salaryTextField.getText().matches("^\\d*.\\d{2}");
             boolean isPeselCorrect = peselTextField.getText().matches("[0-9]{11}");
             if (!isEmployeeDataFieldsEmpty && isSalaryFieldParseDouble && isPeselCorrect) {
                 EmployeeDto employeeDto = createEmployeeDto();

@@ -106,10 +106,9 @@ public class MainController implements Initializable {
                 e.printStackTrace();
             }
             loadDepartmentData();
-            departmentTableView.setItems(departmentData);
             loadEmployeeData();
-            employeeTableView.setItems(employeeData);
         });
+
     }
 
     private void initializeDeleteButton() {
@@ -126,9 +125,7 @@ public class MainController implements Initializable {
                 logger.debug("Usunięcie rekordu działu!");
             }
             loadDepartmentData();
-            departmentTableView.setItems(departmentData);
             loadEmployeeData();
-            employeeTableView.setItems(employeeData);
         });
     }
 
@@ -146,7 +143,6 @@ public class MainController implements Initializable {
         departmentTableView.getColumns().addAll(departmentIdColumn, departmentNameColumn);
 
         loadDepartmentData();
-        departmentTableView.setItems(departmentData);
         logger.debug("Załadowanie danych do widoku tabeli działu");
     }
 
@@ -175,7 +171,6 @@ public class MainController implements Initializable {
 
         employeeTableView.getColumns().addAll(employeeIdColumn, firstNameColumn, lastNameColumn, peselColumn, salaryColumn);
         loadEmployeeData();
-        employeeTableView.setItems(employeeData);
         logger.debug("Załadowanie danych do widoku tabeli pracownika");
 
     }
@@ -190,6 +185,7 @@ public class MainController implements Initializable {
                         .collect(Collectors.toList());
                 this.employeeData.clear();
                 this.employeeData.addAll(employeeTableModels);
+                employeeTableView.setItems(employeeData);
             }
         });
     }
@@ -200,6 +196,7 @@ public class MainController implements Initializable {
             List<DepartmentTableModel> departmentTableModels = departmentDtos.stream().map(DepartmentTableModel::of).collect(Collectors.toList());
             this.departmentData.clear();
             this.departmentData.addAll(departmentTableModels);
+            departmentTableView.setItems(departmentData);
         });
         thread.start();
     }
@@ -215,6 +212,7 @@ public class MainController implements Initializable {
                       this.employeeData.clear();
                   } else {
                       this.seekText.setSeekText(seekField.getText());
+                      logger.debug("Odebranie listy pracowników z backendu.");
                       List<EmployeeDto> seekList = seekRestClient.getSeekListEmployees(seekText);
                       List<EmployeeTableModel> employeeTableModel = seekList.stream().map(EmployeeTableModel::of).collect(Collectors.toList());
                       this.employeeData.clear();

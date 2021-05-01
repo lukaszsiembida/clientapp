@@ -2,8 +2,10 @@ package clientapp.controller;
 
 import clientapp.dto.DepartmentDto;
 import clientapp.dto.EmployeeDto;
+import clientapp.dto.SeekTextDto;
 import clientapp.rest.DepartmentRestClient;
 import clientapp.rest.EmployeeRestClient;
+import clientapp.rest.SeekRestClient;
 import clientapp.table.DepartmentTableModel;
 import clientapp.table.EmployeeTableModel;
 import javafx.collections.FXCollections;
@@ -14,10 +16,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
@@ -38,14 +37,20 @@ public class MainController implements Initializable {
 
     private final DepartmentRestClient departmentRestClient;
     private final EmployeeRestClient employeeRestClient;
+    private final SeekRestClient seekRestClient;
 
     public MainController() {
         departmentRestClient = new DepartmentRestClient();
         employeeRestClient = new EmployeeRestClient();
+        seekRestClient = new SeekRestClient();
     }
 
     private final ObservableList<DepartmentTableModel> departmentData = FXCollections.observableArrayList();
-    private final ObservableList<EmployeeTableModel> employeeData = FXCollections.observableArrayList();;
+    private final ObservableList<EmployeeTableModel> employeeData = FXCollections.observableArrayList();
+    private final SeekTextDto seekText = new SeekTextDto();
+
+    @FXML
+    private TextField seekField;
 
     @FXML
     private Button addButton;
@@ -82,6 +87,7 @@ public class MainController implements Initializable {
         initializeEmployeeTableView();
         initializeAddEmployeeButton();
         initializeDeleteButton();
+        dynamicSeek();
     }
 
     private void initializeAddEmployeeButton() {
@@ -100,7 +106,9 @@ public class MainController implements Initializable {
                 e.printStackTrace();
             }
             loadDepartmentData();
+            departmentTableView.setItems(departmentData);
             loadEmployeeData();
+            employeeTableView.setItems(employeeData);
         });
     }
 
@@ -108,16 +116,19 @@ public class MainController implements Initializable {
         deleteButton.setOnAction((x) -> {
             DepartmentTableModel selectedDepartment = departmentTableView.getSelectionModel().getSelectedItem();
             EmployeeTableModel selectedEmployee = employeeTableView.getSelectionModel().getSelectedItem();
+            if (selectedEmployee != null) {
+                selectedDepartment = null;
+                employeeRestClient.deleteEmployee(selectedEmployee.getEmployeeId());
+                logger.debug("Usunięcie rekordu działu!");
+            }
             if (selectedDepartment != null) {
                 departmentRestClient.deleteDepartment(selectedDepartment.getDepartmentId());
                 logger.debug("Usunięcie rekordu działu!");
             }
-            if (selectedEmployee != null) {
-                employeeRestClient.deleteEmployee(selectedEmployee.getEmployeeId());
-                logger.debug("Usunięcie rekordu działu!");
-            }
             loadDepartmentData();
+            departmentTableView.setItems(departmentData);
             loadEmployeeData();
+            employeeTableView.setItems(employeeData);
         });
     }
 
@@ -170,20 +181,17 @@ public class MainController implements Initializable {
     }
 
     private void loadEmployeeData() {
-        Thread thread = new Thread(() -> {
-            departmentTableView.setOnMouseClicked(d -> {
-              for(DepartmentTableModel departmentTable : departmentTableView.getSelectionModel().getSelectedItems())  {
-                  List<EmployeeDto> employeeDtos = employeeRestClient.getEmployees();
-                  List<EmployeeTableModel> employeeTableModels = employeeDtos.stream()
-                          .filter(e -> departmentTable.getDepartmentName().equals(e.getDepartmentName()))
-                          .map(EmployeeTableModel::of)
-                          .collect(Collectors.toList());
-                  this.employeeData.clear();
-                  this.employeeData.addAll(employeeTableModels);
-              }
-            });
+        departmentTableView.setOnMouseClicked(d -> {
+            for (DepartmentTableModel departmentTable : departmentTableView.getSelectionModel().getSelectedItems()) {
+                List<EmployeeDto> employeeDtos = employeeRestClient.getEmployees();
+                List<EmployeeTableModel> employeeTableModels = employeeDtos.stream()
+                        .filter(e -> departmentTable.getDepartmentName().equals(e.getDepartmentName()))
+                        .map(EmployeeTableModel::of)
+                        .collect(Collectors.toList());
+                this.employeeData.clear();
+                this.employeeData.addAll(employeeTableModels);
+            }
         });
-        thread.start();
     }
 
     private void loadDepartmentData() {
@@ -199,6 +207,21 @@ public class MainController implements Initializable {
     public void setStage(Stage primaryStage) {
         this.stage = primaryStage;
 
+    }
+
+    public void dynamicSeek() {
+              seekField.textProperty().addListener((observable) -> {
+                  if(seekField.getText()==null){
+                      this.employeeData.clear();
+                  } else {
+                      this.seekText.setSeekText(seekField.getText());
+                      List<EmployeeDto> seekList = seekRestClient.getSeekListEmployees(seekText);
+                      List<EmployeeTableModel> employeeTableModel = seekList.stream().map(EmployeeTableModel::of).collect(Collectors.toList());
+                      this.employeeData.clear();
+                      this.employeeData.addAll(employeeTableModel);
+                  }
+                  employeeTableView.setItems(employeeData);
+              });
     }
 }
 

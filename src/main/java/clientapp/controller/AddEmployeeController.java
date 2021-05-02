@@ -72,7 +72,8 @@ public class AddEmployeeController implements Initializable {
                     peselTextField.getText().isEmpty()) && !departmentNameTextField.getText().isEmpty();
             boolean isSalaryFieldParseDouble = salaryTextField.getText().matches("^\\d*.\\d{2}");
             boolean isPeselCorrect = peselTextField.getText().matches("[0-9]{11}");
-            if (!isEmployeeDataFieldsEmpty && isSalaryFieldParseDouble && isPeselCorrect) {
+            boolean isPeselNotUnique = employeeRestClient.getEmployees().stream().map(EmployeeDto::getPesel).anyMatch(e -> e.equals(peselTextField.getText()));
+            if (!isEmployeeDataFieldsEmpty && isSalaryFieldParseDouble && isPeselCorrect && !isPeselNotUnique) {
                 EmployeeDto employeeDto = createEmployeeDto();
                 employeeRestClient.saveEmployee(employeeDto, () -> {
                     Stage infoPopup = popupFactory.createInfoPopup("Pracownik został pomyślnie zapisany", () -> {
@@ -102,6 +103,9 @@ public class AddEmployeeController implements Initializable {
                 }
                 if (!isPeselCorrect){
                     infoText += "Pesel w nieprawidłowym formacie.\n";
+                }
+                if (isPeselNotUnique){
+                    infoText += "Pesel nie jest unikalny.\n";
                 }
                 popupFactory.createInfoPopup(infoText).show();
             }

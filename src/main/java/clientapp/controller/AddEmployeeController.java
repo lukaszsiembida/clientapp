@@ -72,7 +72,10 @@ public class AddEmployeeController implements Initializable {
                     peselTextField.getText().isEmpty()) && !departmentNameTextField.getText().isEmpty();
             boolean isSalaryFieldParseDouble = salaryTextField.getText().matches("^\\d*.\\d{2}");
             boolean isPeselCorrect = peselTextField.getText().matches("[0-9]{11}");
-            boolean isPeselNotUnique = employeeRestClient.getEmployees().stream().map(EmployeeDto::getPesel).anyMatch(e -> e.equals(peselTextField.getText()));
+            boolean isPeselNotUnique = employeeRestClient.getEmployees().stream()
+                    .map(EmployeeDto::getPesel).anyMatch(e -> e.equals(peselTextField.getText()));
+            boolean isDepartmentNotUnique = departmentRestClient.getDepartments().stream()
+                    .map(DepartmentDto::getDepartmentName).anyMatch(d -> d.equals(departmentNameTextField.getText()));
             if (!isEmployeeDataFieldsEmpty && isSalaryFieldParseDouble && isPeselCorrect && !isPeselNotUnique) {
                 EmployeeDto employeeDto = createEmployeeDto();
                 employeeRestClient.saveEmployee(employeeDto, () -> {
@@ -83,7 +86,7 @@ public class AddEmployeeController implements Initializable {
                     });
                     infoPopup.show();
                 });
-        } else if (isDepartmentNameFieldNotEmpty) {
+        } else if (isDepartmentNameFieldNotEmpty && !isDepartmentNotUnique) {
             DepartmentDto departmentDto = createDepartmentDto();
             departmentRestClient.saveDepartment(departmentDto, () -> {
                 Stage infoPopup = popupFactory.createInfoPopup("Dział został pomyślnie zapisany", () -> {
@@ -106,6 +109,9 @@ public class AddEmployeeController implements Initializable {
                 }
                 if (isPeselNotUnique){
                     infoText += "Pesel nie jest unikalny.\n";
+                }
+                if(isDepartmentNameFieldNotEmpty && isDepartmentNotUnique){
+                    infoText = "Nie można dodać działu.\nDział o takiej nazwie już istnieje.";
                 }
                 popupFactory.createInfoPopup(infoText).show();
             }

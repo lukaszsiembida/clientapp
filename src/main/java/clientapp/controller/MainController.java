@@ -208,7 +208,7 @@ public class MainController implements Initializable {
 
     public void dynamicSeek() {
               seekField.textProperty().addListener((observable) -> {
-                  if(seekField.getText()==null){
+                  if(seekField.getText()==null || seekField.getText().equals("")){
                       this.employeeData.clear();
                   } else {
                       this.seekText.setSeekText(seekField.getText());
